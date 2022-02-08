@@ -23,7 +23,8 @@ The implemented behavior is explained to work by differentating macro-enabled Of
 
 [Outflank shed more light on MOTW](https://outflank.nl/blog/2020/03/30/mark-of-the-web-from-a-red-teams-perspective/), back in 2020 by indicating areas where MOTW flag is not uniformly propagated. These areas serve **_defense gap_** role and are commonly abused by threat actors since years by now.
 
-Outflank's research disclosed, that some _container_ file formats - namely **ISO**, **VHD**, **VHDX** do not mark inner files upon auto-mount or auto-extraction. Moreover, Windows 8+ is able to open these formats automatically upon double-click, making them _notorius infection carriers, devaluing MOTW in its security measure role_. 
+Their research disclosed, that some _container_ file formats - namely **ISO**, **VHD**/**VHDX** -  do not propagate MOTW taint flag onto inner files upon auto-mount or auto-extraction. Moreover, Windows 8+ is able to open these formats automatically upon double-click, making them _notorius infection carriers, possibly devaluing MOTW in its security measure role_. 
+
 
 ### Formats known not to propage MOTW
 
