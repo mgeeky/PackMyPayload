@@ -244,13 +244,13 @@ class Packager:
 
 
         if outputFormat == 'iso':
-            output = self.packageIntoISO(infile, outfile)
+            output = self.packIntoISO(infile, outfile)
 
         elif outputFormat == 'cabinet':
-            output = self.packageIntoCAB(infile, outfile)
+            output = self.packIntoCAB(infile, outfile)
 
         elif outputFormat == 'vhd':
-            output = self.packageIntoVHD(infile, outfile)
+            output = self.packIntoVHD(infile, outfile)
 
         else:
             if os.path.isfile(infile):
@@ -278,23 +278,23 @@ class Packager:
         output = False
 
         if outputFormat == 'zipfile':
-            output = self.packageIntoZIP(infile, outfile)
+            output = self.packIntoZIP(infile, outfile)
 
         elif outputFormat == '7zip':
-            output = self.packageInto7ZIP(infile, outfile)
+            output = self.packInto7ZIP(infile, outfile)
 
         elif outputFormat == 'pdf':
-            output = self.packageIntoPDF(infile, outfile)
+            output = self.packIntoPDF(infile, outfile)
 
         elif outputFormat == 'msi':
-            output = self.packageIntoMSI(infile, outfile)
+            output = self.packIntoMSI(infile, outfile)
 
         else:
             self.logger.fatal(f'Unsupported archive format: {outputFormat}!')
 
         return output
 
-    def packageIntoZIP(self, infile, outfile):
+    def packIntoZIP(self, infile, outfile):
         try:
             mode = 'w'
             if self.backdoorFile:
@@ -360,7 +360,7 @@ class Packager:
 
             return False
 
-    def packageInto7ZIP(self, infile, outfile):
+    def packInto7ZIP(self, infile, outfile):
         try:
             mode = 'w'
             if self.backdoorFile:
@@ -387,30 +387,7 @@ class Packager:
 
             return False
 
-    def collectIsoJolietFiles(self, iso, basedir = '/'):
-        files = []
-        for dirname, dirlist, filelist in iso.walk(joliet_path=basedir):
-            print(f"Base: {basedir}, Dirname:", dirname, ", Dirlist:", dirlist, ", Filelist:", filelist)
-
-            for file in filelist:
-                if ';' in file:
-                    file = file.split(';')[0]
-                    self.logger.dbg(f'\tfile: {file}')
-
-                if file.startswith('/'):
-                    file = file[1:]
-
-                files.append(('file', os.path.join(dirname, file)))
-
-            for dirn in dirlist:
-                self.logger.dbg(f'\tdir: {dirn}')
-                dirn = os.path.join(basedir, dirn)
-                files.append(('dir', dirn))
-                files.extend(self.collectIsoJolietFiles(iso, dirn))
-
-        return files
-
-    def packageIntoMSI(self, infile, outfile):
+    def packIntoMSI(self, infile, outfile):
         raise Exception("MSI files are not yet supported.")
 
 #        try:
@@ -441,7 +418,7 @@ class Packager:
 #
 #            return False
 
-    def packageIntoVHD(self, infile, outfile):
+    def packIntoVHD(self, infile, outfile):
         diskpartFile = None
         diskpartFile2 = None
         vhdFile = None
@@ -752,7 +729,30 @@ DISKPART> select vdisk file={outfile}
 DISKPART> detach vdisk
 ''')
 
-    def packageIntoISO(self, infile, outfile):
+    def collectIsoJolietFiles(self, iso, basedir = '/'):
+        files = []
+        for dirname, dirlist, filelist in iso.walk(joliet_path=basedir):
+            print(f"Base: {basedir}, Dirname:", dirname, ", Dirlist:", dirlist, ", Filelist:", filelist)
+
+            for file in filelist:
+                if ';' in file:
+                    file = file.split(';')[0]
+                    self.logger.dbg(f'\tfile: {file}')
+
+                if file.startswith('/'):
+                    file = file[1:]
+
+                files.append(('file', os.path.join(dirname, file)))
+
+            for dirn in dirlist:
+                self.logger.dbg(f'\tdir: {dirn}')
+                dirn = os.path.join(basedir, dirn)
+                files.append(('dir', dirn))
+                files.extend(self.collectIsoJolietFiles(iso, dirn))
+
+        return files
+
+    def packIntoISO(self, infile, outfile):
         if infile.lower().endswith('.img'):
             self.logger.text('Will generate .IMG file that is in fact .ISO')
 
@@ -957,7 +957,7 @@ DISKPART> detach vdisk
             myPdfFileWriterObj._root_object["/Names"]["/EmbeddedFiles"]["/Names"].append(filespec)
 
 
-    def packageIntoPDF(self, infile, outfile):
+    def packIntoPDF(self, infile, outfile):
         try:
             fpath, fileext = os.path.splitext(infile.lower())
 
@@ -1080,7 +1080,7 @@ When PDF is password-encrypted, autorun Javascript will not execute to prompt us
 
             return False
 
-    def packageIntoCAB(self, infile, outfile):
+    def packIntoCAB(self, infile, outfile):
         try:
             if self.password:
                 raise Exception('Passwords are not supported by Windows Cabinet files.')
