@@ -992,7 +992,7 @@ Be vary about that, becasue this MAY HINDER your target initial access stage!
 
 Try to find another extension for your embedded file that is not blacklisted.
 
-Pssst. .doc/.xls work like a charm ( ͡~ ͜ʖ ͡°)
+Pssst. .doc/.xls work like a charm ;-)
 
 =====================================================
 ''', color='red')
