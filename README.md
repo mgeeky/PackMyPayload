@@ -3,14 +3,13 @@
 This tool takes a file or directory on input and embeds them into an output file acting as an archive/container. 
 It can serve purpose for a Proof-of-Concept presenting emerging risk of container file formats with embedded malware, as well as helper for professional Red Team Operators to sharpen their Initial Access maneuvers.
 
-Currently Threat Actors are smuggling their malicious payloads archived in various container file formats, such as:
+Currently Threat Actors are known to smuggle their malware archived in various container file formats, to name a few:
 - `7zip`
 - `zip`
 - `ISO`
 - `IMG`
-- `CAB`
 
-They do that to get their payloads passed file content scanners, but more importantly to _avoid having Mark-Of-The-Web flag on their files_. 
+They do that to get their payloads pass file content scanners, but more importantly to _avoid having Mark-Of-The-Web flag on their files_. There're various motives on why adversaries don't want MOTW on their files: _Protected View_ in Microsoft Office was always among them.
 
 Should they provide container file to their victims, **a foundation for disabling VBA macros in Internet-originated Office documents** might be bypassed.
 
