@@ -24,6 +24,7 @@ import py7zr
 import pycdlib
 import cabarchive
 import msilib
+import traceback
 import csv
 import subprocess
 import ctypes
@@ -633,17 +634,33 @@ class Packager:
             self.logger.text('[.] Packing files into created VHD...')
             time.sleep(3)
 
-            if os.path.isfile(infile):
-                shutil.copy(infile, dstpath)
+            try:
+                if os.path.isfile(infile):
+                    shutil.copy(infile, dstpath)
 
-                self.logger.info('Packaged file:')
-                self.logger.info(f'\t{infile} => {dstpath}')
+                    self.logger.info('Packaged file:')
+                    self.logger.info(f'\t{infile} => {dstpath}')
 
-            elif os.path.isdir(infile):
-                shutil.copytree(infile, dstpath)
+                elif os.path.isdir(infile):
+                    errcount = 0
 
-                self.logger.info('Packaged directory:')
-                self.logger.info(f'\t{infile} => {dstpath}')
+                    for fname in glob.iglob(infile + '/**/**', recursive=True):
+                        infile1 = fname
+                        if os.path.isdir(infile1):
+                            if errcount < 3:
+                                self.logger.err('Creating subdirectories in VHD/VHDX is not supported! Will place nested files to volume\'s root.')
+                                errcount += 1
+
+                            continue
+
+                        shutil.copy(infile1, dstpath)
+
+                    self.logger.info('Packaged directory:')
+                    self.logger.info(f'\t{infile} => {dstpath}')
+
+            except Exception as e:
+                self.logger.err(f'Copying files onto VHD/VHDX failed miserably: {e}')
+                self.logger.err(traceback.format_exc())
 
             detachTemplate = ''
             with open(Packager.diskpartDetachVHD, 'r') as f:

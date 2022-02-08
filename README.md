@@ -8,13 +8,11 @@ Currently Threat Actors are smuggling their malicious payloads archived in vario
 - `zip`
 - `ISO`
 - `IMG`
-- `VHD`
-- `VHDX`
 - `CAB`
 
 They do that to get their payloads passed file content scanners, but more importantly to _avoid having Mark-Of-The-Web flag on their files_. 
 
-Should they provide container file to their victims, **a foundation for disabling VBA macros in Internet-originated Office documents** would be bypassed.
+Should they provide container file to their victims, **a foundation for disabling VBA macros in Internet-originated Office documents** might be bypassed.
 
 
 ## Background
@@ -27,14 +25,17 @@ The implemented behavior is explained to work by differentating macro-enabled Of
 
 Outflank's research disclosed, that some _container_ file formats - namely **ISO**, **VHD**, **VHDX** do not mark inner files upon auto-mount or auto-extraction. Moreover, Windows 8+ is able to open these formats automatically upon double-click, making them _notorius infection carriers, devaluing MOTW in its security measure role_. 
 
-### Formats known to not propage MOTW
+### Formats known not to propage MOTW
 
 Some of the formats supported by this tool were added for other reasons than to bypass MOTW flag. They play important roles during other stages of Red Team engagement delivery (especially `CAB` file).
 
-Formats known to not propagate MOTW:
+Formats known not to propagate MOTW:
 
 - `ISO`
-- `7zip` upon manual files extraction
+- `IMG`
+- `7zip` _upon manual files extraction_
+- `VHD/VHDX`
+
 
 ## Demo - How Threat Actors Evade MOTW and Smuggle Macros
 
@@ -88,6 +89,8 @@ However, **the inner 7zip installer EXE file is not MOTW-marked!**
 ![not-marked](imgs/not-marked.png)
 
 
+--
+
 ## Rationale
 
 Using the occassion that Industry's eyes are turned on Microsoft's brave decision to block VBA Macros, we, professional Security Researchers taking the utmost consideration on increasing World's technologies resielience against their misuse, want to add following insight into current Threat Actor TTPs:
@@ -113,7 +116,9 @@ It is advised to contain (and/or block) files having above listed extensions whe
 The tool released will hopefully enable more Red Teams to simulate discussed risks and help them identify detection gaps within their Partners defenses more easily.
 
 
-## Script's Features
+--
+
+## Features
 
 This script offers following treats & goodies:
 
@@ -129,6 +134,13 @@ This script offers following treats & goodies:
   6. `CAB` 
   7. `VHD` 
   8. `VHDX` 
+
+
+### Caveats
+
+- `VHD/VHDX` require elevated permissions to become mounted.
+- `PDF` relies on Javascript support being enabled and prompts user to run embedded files.
+- `CAB` requires more clicks on the victim-side to become extracted.
 
 
 ## Installation
@@ -207,6 +219,7 @@ o      ~     +           ~          <mb [at] binary-offensive.com>
 ```
 
 
+---
 
 ## Full usage
 
@@ -271,7 +284,7 @@ Supported container/archive formats:
 
 ## Known Issues
 
-- Packing input directory into output VHD/VHDX is known to cause Access Denied issues. I'm working on it.
+- Can't create directories while copying files onto VHD/VHDX mounted volumes.
 
 
 ---
