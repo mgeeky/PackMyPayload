@@ -90,20 +90,13 @@ However, **the inner 7zip installer EXE file is not MOTW-marked!**
 ![not-marked](imgs/not-marked.png)
 
 
---
+---
 
 ## Rationale
 
 Using the occassion that Industry's eyes are turned on Microsoft's brave decision to block VBA Macros, we, professional Security Researchers taking the utmost consideration on increasing World's technologies resielience against their misuse, want to add following insight into current Threat Actor TTPs:
 
-**Threat Actors** are well aware of the impact MOTW has on their phishing payloads. They've adapted long time ago and are now smuggling their malicious programs inside of containers.
-
-Among the most commonly observed ones we can highlight:
-- `ISO`
-- `IMG`
-- `VHD`
-- `VHDX`
-- `CAB`
+**Threat Actors** are well aware of the impact MOTW has on their phishing payloads. They've adapted long time ago and are now smuggling their malicious programs inside of containers. Among the most commonly observed ones we can highlight are `ISO`, `IMG`, `CAB`.
 
 **I am now releasing this tool to increase the momentum built on Microsoft's stand and to help intensify discussions on these evasion avenues**.
 
@@ -117,7 +110,7 @@ It is advised to contain (and/or block) files having above listed extensions whe
 The tool released will hopefully enable more Red Teams to simulate discussed risks and help them identify detection gaps within their Partners defenses more easily.
 
 
---
+---
 
 ## Features
 
@@ -292,19 +285,24 @@ Supported container/archive formats:
 
 ## TODO
 
-- Add support for MSI files
-- Add support to other file formats (not really coping with MOTW or supported off the shelve by Windows):
-  - tar
-  - cpio
-  - pax
-  - xar
-  - ar
-  - mtree
-  - shar
-  - tar
-  - cpgz
-  - uu
-  - lha
+- Add support for `MSI` files
+
+- Consider adding support to other egzotic archive formats (not really coping with MOTW or supported off the shelve by Windows):
+  - `tar`
+  - `cpio`
+  - `pax`
+  - `xar`
+  - `ar`
+  - `mtree`
+  - `shar`
+  - `tar`
+  - `cpgz`
+  - `uu`
+  - `lha`
+
+- **WinZip Pro** also supports extraction of following formats - maybe worth adding them too:
+  - `B64`, `BHX`, `BZ`, `BZ2`, `GZ`, `HQX`, `LHA`, `LZH`, `MIM`, `TAZ`, `TBZ`, 
+  - `TBZ2`, `TGZ`, `TXZ`, `TZ`, `UU`, `UUE`, `VMDK`, `XXE`, `XZ`, `Z`, `ZIPX`, 
 
 ---
 
