@@ -1,0 +1,8 @@
+create vdisk file=<<<FILE>>> type=expandable maximum=<<<SIZE_IN_MB>>>
+select vdisk file=<<<FILE>>>
+attach vdisk
+clean
+create partition primary
+format fs=<<<FILESYSTEM>>>
+list partition
+assign letter=<<<DRIVE_LETTER>>>

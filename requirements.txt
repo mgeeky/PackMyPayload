@@ -1,0 +1,7 @@
+zipfile
+pyminizip
+py7zr
+pycdlib
+cabarchive
+pypdf2
+ctypes
