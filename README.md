@@ -27,6 +27,15 @@ The implemented behavior is explained to work by differentating macro-enabled Of
 
 Outflank's research disclosed, that some _container_ file formats - namely **ISO**, **VHD**, **VHDX** do not mark inner files upon auto-mount or auto-extraction. Moreover, Windows 8+ is able to open these formats automatically upon double-click, making them _notorius infection carriers, devaluing MOTW in its security measure role_. 
 
+### Formats known to not propage MOTW
+
+Some of the formats supported by this tool were added for other reasons than to bypass MOTW flag. They play important roles during other stages of Red Team engagement delivery (especially `CAB` file).
+
+Formats known to not propagate MOTW:
+
+- `ISO`
+- `7zip` upon manual files extraction
+
 ## Demo - How Threat Actors Evade MOTW and Smuggle Macros
 
 Lets present how **Mark of the Web** flag looks like in practice:
@@ -202,21 +211,22 @@ o      ~     +           ~          <mb [at] binary-offensive.com>
 ## Full usage
 
 ```
-usage:
 +      o     +              o   +      o     +              o
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.0.0)      _-_-_-_-_-_-_-|   /\\_/\
-   for all your VBA cravings.      -_-_-_-_-_-_-~|__( ^ .^)  +    +
+   :: PACK MY PAYLOAD (1.0.0)       -_-_-_-_-_-_-|   /\_/\
+   for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
-+      o            +      o    ~    Mariusz Banach / mgeeky  o
++      o            +      o    ~   Mariusz Banach / mgeeky    o
+o      ~     +           ~          <mb [at] binary-offensive.com>
     o           +                         o           +           +
 
-Usage: PackMyPayload.py [options] <infile> <outfile>
+Usage: ./package.py [options] <infile> <outfile>
 
 options:
+  -h, --help            show this help message and exit
 
 Required arguments:
   infile                Input file/directory to be packaged into output archive/container
@@ -231,8 +241,12 @@ Options:
   -n NAME, --filename NAME
                         Package input file into archive/container under this filename (may contain relative path).
   -p PASSWORD, --password PASSWORD
-                        Explicitely define output format disregarding output file's extension. Can be one of following: zip, 7z, iso, img, cab, pdf, vhd, vhdx
+                        If output archive/container format supports password protection, use this password to protect output file.
+  --out-format {zip,7z,iso,img,cab,pdf,vhd,vhdx}
+                        Explicitely define output format disregarding output file's extension. Can be one of following: zip, 7z, iso, img, cab, pdf, vhd,
+                        vhdx
 
+VHD specific options:
   --vhd-size SIZE       VHD dynamic size in MB. Default: 1024
   --vhd-letter LETTER   Drive letter where to mount VHD drive. Default: will pick unused one at random.
   --vhd-filesystem FS   Filesystem to be used while formatting VHD. Default: FAT32. Supported: fat, fat32, ntfs
@@ -253,6 +267,30 @@ Supported container/archive formats:
 =====================================================
 ```
 
+---
+
+## Known Issues
+
+- Packing input directory into output VHD/VHDX is known to cause Access Denied issues. I'm working on it.
+
+
+---
+
+## TODO
+
+- Add support for MSI files
+- Add support to other file formats (not really coping with MOTW or supported off the shelve by Windows):
+  - tar
+  - cpio
+  - pax
+  - xar
+  - ar
+  - mtree
+  - shar
+  - tar
+  - cpgz
+  - uu
+  - lha
 
 ---
 

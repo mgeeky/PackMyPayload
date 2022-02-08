@@ -17,6 +17,7 @@ import random
 import base64
 import shutil
 import zipfile
+import time
 import tempfile
 import pyminizip
 import py7zr
@@ -630,6 +631,7 @@ class Packager:
                     return False
 
             self.logger.text('[.] Packing files into created VHD...')
+            time.sleep(3)
 
             if os.path.isfile(infile):
                 shutil.copy(infile, dstpath)
@@ -695,6 +697,9 @@ DISKPART commands ({diskpartDetachPath}):
 
         except Exception as e:
             self.logger.err(f'Could not package input file into VHD! Exception: {e}')
+            if 'access is denied' in str(e).lower():
+                self.logger.err(f'Try changing VHD volume mount letter with --vhd-letter .')
+                
             raise
 
             return False
@@ -718,7 +723,20 @@ DISKPART commands ({diskpartDetachPath}):
 
             if mount:
                 self.logger.err(f'WARNING! Your VHD file is still mounted on ({dstpath} / {vhdletter})! You will need to unmount it manually from Windows Explorer!')
+                self.logger.err(f'''-----------------------------------------------------------
+To manually detach VHD disk follow these from an elevated prompt:
 
+cmd> diskpart
+DISKPART> list vdisk
+
+  VDisk ###  Disk ###  State                 Type       File
+  ---------  --------  --------------------  ---------  ----
+  VDisk 1    Disk 2    Attached not open     Expandable  {outfile}
+
+DISKPART> select vdisk file={outfile}
+
+DISKPART> detach vdisk
+''')
 
     def packageIntoISO(self, infile, outfile):
         if infile.lower().endswith('.img'):
