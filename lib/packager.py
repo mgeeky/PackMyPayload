@@ -93,6 +93,8 @@ class Packager:
     # The message will be:
     #   "Adobe Acrobat cannot open the file attachment because your PDF file attachment 
     #    settings do not allow this type of file to be opened."
+    #
+    # However .doc/.xls work like a charm ;-)
     # 
     AdobeAcrobatReader_ExtensionsBlacklist = [
         '.acm', '.ad', '.ade', '.adp', '.air', '.app', '.application', '.appref-ms', '.arc', '.arj',
@@ -634,33 +636,28 @@ class Packager:
             self.logger.text('[.] Packing files into created VHD...')
             time.sleep(3)
 
-            try:
-                if os.path.isfile(infile):
-                    shutil.copy(infile, dstpath)
+            if os.path.isfile(infile):
+                shutil.copy(infile, dstpath)
 
-                    self.logger.info('Packaged file:')
-                    self.logger.info(f'\t{infile} => {dstpath}')
+                self.logger.info('Packaged file:')
+                self.logger.info(f'\t{infile} => {dstpath}')
 
-                elif os.path.isdir(infile):
-                    errcount = 0
+            elif os.path.isdir(infile):
+                errcount = 0
 
-                    for fname in glob.iglob(infile + '/**/**', recursive=True):
-                        infile1 = fname
-                        if os.path.isdir(infile1):
-                            if errcount < 3:
-                                self.logger.err('Creating subdirectories in VHD/VHDX is not supported! Will place nested files to volume\'s root.')
-                                errcount += 1
+                for fname in glob.iglob(infile + '/**/**', recursive=True):
+                    infile1 = fname
+                    if os.path.isdir(infile1):
+                        if errcount < 3:
+                            self.logger.err('Creating subdirectories in VHD/VHDX is not supported! Will place nested files to volume\'s root.')
+                            errcount += 1
 
-                            continue
+                        continue
 
-                        shutil.copy(infile1, dstpath)
+                    shutil.copy(infile1, dstpath)
 
-                    self.logger.info('Packaged directory:')
-                    self.logger.info(f'\t{infile} => {dstpath}')
-
-            except Exception as e:
-                self.logger.err(f'Copying files onto VHD/VHDX failed miserably: {e}')
-                self.logger.err(traceback.format_exc())
+                self.logger.info('Packaged directory:')
+                self.logger.info(f'\t{infile} => {dstpath}')
 
             detachTemplate = ''
             with open(Packager.diskpartDetachVHD, 'r') as f:
@@ -716,7 +713,7 @@ DISKPART commands ({diskpartDetachPath}):
             self.logger.err(f'Could not package input file into VHD! Exception: {e}')
             if 'access is denied' in str(e).lower():
                 self.logger.err(f'Try changing VHD volume mount letter with --vhd-letter .')
-                
+
             raise
 
             return False
@@ -994,6 +991,8 @@ The message will be:
 Be vary about that, becasue this MAY HINDER your target initial access stage!
 
 Try to find another extension for your embedded file that is not blacklisted.
+
+Pssst. .doc/.xls work like a charm ( ͡~ ͜ʖ ͡°)
 
 =====================================================
 ''', color='red')
