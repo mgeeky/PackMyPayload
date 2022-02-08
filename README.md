@@ -1,6 +1,7 @@
 # `PackMyPayload` - Emerging Threat of Containerized Malware
 
-This tool takes a file or directory on input and packages them into an output file archive/container. It can serve purpose for a Proof-of-Concept presenting emerging risk of container file formats with embedded malware, as well as helper for professional Red Team Operators to sharpen their Initial Access maneuvers.
+This tool takes a file or directory on input and embeds them into an output file acting as an archive/container. 
+It can serve purpose for a Proof-of-Concept presenting emerging risk of container file formats with embedded malware, as well as helper for professional Red Team Operators to sharpen their Initial Access maneuvers.
 
 Currently Threat Actors are smuggling their malicious payloads archived in various container file formats, such as:
 - `7zip`
