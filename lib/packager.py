@@ -253,6 +253,8 @@ class Packager:
                 output = self.doThePacking(infile, outfile, outputFormat)
         
             elif os.path.isdir(infile):
+                output = True
+
                 for fname in glob.iglob(infile + '/**/**', recursive=True):
                     infile1 = fname
                     if os.path.isdir(infile1):
@@ -269,6 +271,8 @@ class Packager:
         return output and os.path.isfile(outfile)
 
     def doThePacking(self, infile, outfile, outputFormat):
+        output = False
+
         if outputFormat == 'zipfile':
             output = self.packageIntoZIP(infile, outfile)
 
