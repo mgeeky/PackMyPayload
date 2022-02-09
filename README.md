@@ -25,18 +25,6 @@ The implemented behavior is explained to work by differentating macro-enabled Of
 Their research disclosed, that some _container_ file formats - namely **ISO**, **VHD**/**VHDX** -  do not propagate MOTW taint flag onto inner files upon auto-mount or auto-extraction. Moreover, Windows 8+ is able to open these formats automatically upon double-click, making them _notorius infection carriers, possibly devaluing MOTW in its security measure role_. 
 
 
-### Formats known not to propage MOTW
-
-Some of the formats supported by this tool were added for other reasons than to bypass MOTW flag. They play important roles during other stages of Red Team engagement delivery (especially `CAB` file).
-
-Formats known not to propagate MOTW:
-
-- `ISO`
-- `IMG`
-- `7zip` _upon manual files extraction_
-- `VHD/VHDX`
-
-
 ## Demo - How Threat Actors Evade MOTW and Smuggle Macros
 
 Lets present how **Mark of the Web** flag looks like in practice:
@@ -118,22 +106,20 @@ This script offers following treats & goodies:
 - Packages input file or directory into output container
 - Can backdoor existing containers or create new ones.
 - Provides password encryption for supported formats
-- Supports following container formats:
-  1. `ZIP` (+password)
-  2. `7zip` (+password)
-  3. `PDF` (+password)
-  4. `ISO` 
-  5. `IMG` 
-  6. `CAB` 
-  7. `VHD` 
-  8. `VHDX` 
 
+Formats supported:
 
-### Caveats
+| Format | Strips MOTW? | Off the shelf Windows support? | Elevation required? | Remarks                                       |
+|--------|--------------|--------------------------------|---------------------|-----------------------------------------------|
+| `Zip`  | No           | Yes                            | No                  |                                               |
+| `7zip` | Partially    | No                             | No                  | MOTW stripped only on manual files extraction |
+| `ISO`  | Yes          | Yes                            | No                  |                                               |
+| `IMG`  | Yes          | Yes                            | No                  |                                               |
+| `PDF`  | ?            | Yes                            | No                  | Depends on Javascript support in PDF reader   |
+| `CAB`  | No           | Yes                            | No                  | Requires few additional clicks on victim-side |
+| `VHD`  | Yes          | Yes                            | Yes                 | This script currently can't make directories  |
+| `VHDX` | Yes          | Yes                            | Yes                 | This script currently can't make directories  |
 
-- `VHD/VHDX` require elevated permissions to become mounted.
-- `PDF` relies on Javascript support being enabled and prompts user to run embedded files.
-- `CAB` requires more clicks on the victim-side to become extracted.
 
 
 ## Installation
