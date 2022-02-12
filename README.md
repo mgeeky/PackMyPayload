@@ -274,6 +274,8 @@ Supported container/archive formats:
 
 - Add support for `MSI` files
 
+- Embed files into MS Office 2007+ documents: `word` -> `embeddings` -> `oleObject1.bin` (OLE stream) + adjust 
+
 - Consider adding support to other egzotic archive formats (not really coping with MOTW or supported off the shelve by Windows):
   - `tar`
   - `cpio`
