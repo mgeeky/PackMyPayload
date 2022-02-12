@@ -1,6 +1,6 @@
 # `PackMyPayload` - Emerging Threat of Containerized Malware
 
-[Click for a fast-forward to supported formats](https://github.com/mgeeky/PackMyPayload#features)
+[Jump to supported formats](https://github.com/mgeeky/PackMyPayload#features)
 
 This tool takes a file or directory on input and embeds them into an output file acting as an archive/container. 
 It can serve purpose for a Proof-of-Concept presenting emerging risk of container file formats with embedded malware, as well as helper for professional Red Team Operators to sharpen their Initial Access maneuvers.
