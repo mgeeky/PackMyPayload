@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 #
 # Requirements:
-# - zipfile
+# - zipfile2
 # - pyminizip
 # - py7zr
 # - pycdlib
 # - cabarchive
 # - pypdf2
-# - ctypes
 #
 
 import os, sys, re
@@ -23,7 +22,6 @@ import pyminizip
 import py7zr
 import pycdlib
 import cabarchive
-import msilib
 import traceback
 import csv
 import subprocess
@@ -39,6 +37,12 @@ try:
     from cStringIO import StringIO as BytesIO
 except ImportError:
     from io import BytesIO
+
+try:
+    import msilib
+    MSILIB_LOADED = True
+except ImportError:
+    MSILIB_LOADED = False
 
 
 def getFactoryPath(path, name = ''):
@@ -389,6 +393,9 @@ class Packager:
 
     def packIntoMSI(self, infile, outfile):
         raise Exception("MSI files are not yet supported.")
+
+        if not MSILIB_LOADED:
+            self.logger.fatal('Could not import "msilib"! Make sure your Python3 supports msilib package.')
 
 #        try:
 #            if self.backdoorFile:
