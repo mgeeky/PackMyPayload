@@ -143,7 +143,7 @@ PS> py PackMyPayload.py C:\my\dir malicious.iso -v
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.0.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
@@ -169,7 +169,7 @@ PS> py PackMyPayload.py .\evil.lnk .\evil.vhd -v -N
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.0.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
@@ -205,11 +205,12 @@ o      ~     +           ~          <mb [at] binary-offensive.com>
 ## Full usage
 
 ```
+usage:
 +      o     +              o   +      o     +              o
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.0.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
@@ -235,10 +236,12 @@ Options:
   -n NAME, --filename NAME
                         Package input file into archive/container under this filename (may contain relative path).
   -p PASSWORD, --password PASSWORD
-                        If output archive/container format supports password protection, use this password to protect output file.
+                        If output archive/container format supports password protection, use this password to protect
+                        output file.
   --out-format {zip,7z,iso,img,cab,pdf,vhd,vhdx}
-                        Explicitely define output format disregarding output file's extension. Can be one of following: zip, 7z, iso, img, cab, pdf, vhd,
-                        vhdx
+                        Explicitely define output format disregarding output file's extension. Can be one of
+                        following: zip, 7z, iso, img, cab, pdf, vhd, vhdx
+  --hide HIDE           Set hidden attribute on file(s) in ISO
 
 VHD specific options:
   --vhd-size SIZE       VHD dynamic size in MB. Default: 1024
@@ -304,6 +307,14 @@ py Pack My Payload dot py
 ```
 
 Some say the spell summons ancient DAEMON and Sheeps `( ͡~ ͜ʖ ͡°)`
+
+---
+
+## Contributors
+
+Round of applause & thank you to the following contributors who helped enhance this tool:
+
+- @ChoiSG ([@_choisec](https://twitter.com/_choisec)) - added `--hide` flag for hiding file(s) in ISO/IMG containers
 
 
 ---
