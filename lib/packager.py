@@ -246,6 +246,10 @@ class Packager:
             self.logger.info(f'Will backdoor existing archive:')
             self.logger.info('\t' + self.backdoorFile + '\n', color='magenta')
 
+        if 'hide' in self.options.keys() and len(self.options['hide']) > 0:
+            self.hide = self.options['hide']
+            if ',' in self.hide: 
+                self.hide = self.hide.split(',')
 
         if outputFormat == 'iso':
             output = self.packIntoISO(infile, outfile)
@@ -845,6 +849,16 @@ DISKPART> detach vdisk
                             self.logger.text(f'\tAdding dir : /{jp}')
 
                             iso2.add_directory(joliet_path=f'/{jp}')
+                    
+                    # Hide file(s) when backdooring existing iso file
+                    if self.hide != '': 
+                        if type(self.hide) is list:
+                            for hideFile in self.hide:
+                                self.logger.text(f'\tHiding file: //{hideFile}') 
+                                iso2.set_hidden(joliet_path=f'/{hideFile};1')
+                        else:
+                            self.logger.text(f'\tHiding file: //{self.hide}') 
+                            iso2.set_hidden(joliet_path=f'/{self.hide};1')
 
                     iso2.write(outfile)
                     iso2.close()
@@ -898,6 +912,16 @@ DISKPART> detach vdisk
 
                             self.logger.text(f'\tAdding file: /{lf}')
                             iso.add_file(fname, joliet_path=f'/{lf};1')
+                    
+                # Hide file(s) when specified 
+                if self.hide != '': 
+                    if type(self.hide) is list:
+                        for hideFile in self.hide:
+                            self.logger.text(f'\tHiding file: //{hideFile}') 
+                            iso.set_hidden(joliet_path=f'/{hideFile};1')
+                    else:
+                        self.logger.text(f'\tHiding file: //{self.hide}') 
+                        iso.set_hidden(joliet_path=f'/{self.hide};1')
 
                 iso.write(outfile)
                 iso.close()

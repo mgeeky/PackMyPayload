@@ -74,6 +74,7 @@ Supported container/archive formats:
     opt.add_argument('-n', '--filename', default='', metavar='NAME', help='Package input file into archive/container under this filename (may contain relative path).')
     opt.add_argument('-p', '--password', default='', metavar='PASSWORD', help='If output archive/container format supports password protection, use this password to protect output file.')
     opt.add_argument('--out-format', default='', choices=lib.packager.Packager.formatsMap.keys(), help = 'Explicitely define output format disregarding output file\'s extension. Can be one of following: ' + ', '.join(lib.packager.Packager.formatsMap.keys()))
+    opt.add_argument('--hide', default='', type=str, help='Set hidden attribute on file(s) in ISO')
 
     vhdopts = opts.add_argument_group('VHD specific options')
     vhdopts.add_argument('--vhd-size', default=1024, type=int, metavar='SIZE', help='VHD dynamic size in MB. Default: 1024')
