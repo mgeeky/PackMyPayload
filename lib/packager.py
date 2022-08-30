@@ -215,7 +215,7 @@ class Packager:
         self.outputFormat = outputFormat
         self.backdoorFile = None
         self.password = None
-
+        self.hide = ""
         self.fileName = os.path.basename(infile)
         tmpdir = None
         output = False
