@@ -113,7 +113,7 @@ Formats supported:
 
 | Format | Strips MOTW? | Off the shelf Windows support? | Elevation required? | Remarks                                       |
 |--------|--------------|--------------------------------|---------------------|-----------------------------------------------|
-| `Zip`  | No           | Yes                            | No                  |                                               |
+| `Zip`  | No*          | Yes                            | No                  | (MOTW stripped with [CVE-2022-41091](https://twitter.com/wdormann/status/1590044005395357697))       |
 | `7zip` | Partially    | No                             | No                  | MOTW stripped only on manual files extraction |
 | `ISO`  | Yes          | Yes                            | No                  |                                               |
 | `IMG`  | Yes          | Yes                            | No                  |                                               |
@@ -122,7 +122,7 @@ Formats supported:
 | `VHD`  | Yes          | Yes                            | Yes                 | This script currently can't make directories  |
 | `VHDX` | Yes          | Yes                            | Yes                 | This script currently can't make directories  |
 
-
+* In ZIP case, MOTW can be stripped when [CVE-2022-41091](https://twitter.com/wdormann/status/1590044005395357697) is abused. **PackMyPayload** by default marks inner ZIP files as read-only unless `--zip-noreadonly` given.
 
 ## Installation
 
@@ -143,7 +143,7 @@ PS> py PackMyPayload.py C:\my\dir malicious.iso -v
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.2.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
@@ -169,7 +169,7 @@ PS> py PackMyPayload.py .\evil.lnk .\evil.vhd -v -N
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.2.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o
@@ -210,7 +210,7 @@ usage:
     +             o     +           +             o     +         +
     o  +           +        +           o  +           +          o
 -_-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-_-_-_-_-_-_-_,------,      o
-   :: PACK MY PAYLOAD (1.1.0)       -_-_-_-_-_-_-|   /\_/\
+   :: PACK MY PAYLOAD (1.2.0)       -_-_-_-_-_-_-|   /\_/\
    for all your container cravings   -_-_-_-_-_-~|__( ^ .^)  +    +
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_-_-_-_-_-''  ''
 +      o         o   +       o       +      o         o   +       o

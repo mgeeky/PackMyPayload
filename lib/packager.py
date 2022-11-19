@@ -129,6 +129,13 @@ class Packager:
         '.potm',
     ]
 
+    SupportedOfficeExtensions = [
+        'docm', 'doc', 'xls', 'xlsm', 'rtf', 'xlam', 'xla', 'xlt', 'xltm', 'xlsb',
+        'dot', 'dotm', 'ppam', 'pptm', 'ppsm', 'potm', 'mpp', 'mpt', 'mpx',
+        'vdw', 'vsd', 'vsdm', 'vss', 'vssm', 'vstm', 'vst', 'mdb', 'accde',
+        'docx', 'xlsx', 'pptx'
+    ]
+
     diskpartCreateVHD = getFactoryPath('templates/diskpart-create-vhd.txt')
     diskpartDetachVHD = getFactoryPath('templates/diskpart-detach-vhd.txt')
     diskpartMountVHD = getFactoryPath('templates/diskpart-mount-vhd.txt')
@@ -145,6 +152,13 @@ class Packager:
         }
 
         opts.update(self.options)
+
+    @staticmethod
+    def isOfficeDocumentExtension(infile):
+        filename, fileext = os.path.splitext(infile.lower())
+        fileext = fileext[1:]
+
+        return fileext in Packager.SupportedOfficeExtensions
 
     @staticmethod
     def isFileExtensionSupported(infile):
@@ -187,7 +201,7 @@ class Packager:
             outs, errs = proc.communicate(timeout=60)
             proc.wait()
 
-        except TimeoutExpired:
+        except subprocess.TimeoutExpired:
             proc.kill()
             outs, errs = proc.communicate()
 
@@ -205,9 +219,9 @@ class Packager:
 
         elif outputFormat == 'auto':
             if len(outfile) > 0:
-                outputFormat = lib.Packager.Packager.getFormat(outfile)
+                outputFormat = Packager.getFormat(outfile)
             elif 'out_format' in self.options.keys() and len(self.options['out_format']) > 0:
-                outputFormat = lib.Packager.Packager.getFormat(self.options['out_format'])
+                outputFormat = Packager.getFormat(self.options['out_format'])
             else:
                 self.logger.fatal('Output format could not be recognized. Make sure it is one of following: ' 
                     + ', '.join(Packager.formatsMap.keys()))
@@ -311,6 +325,40 @@ class Packager:
             with zipfile.ZipFile(outfile, mode) as container:
                 with open(infile, 'rb') as f:
                     container.write(infile, os.path.basename(infile))
+
+            if not self.options.get('zip_noreadonly', False):
+                if os.path.isfile(infile) and Packager.isOfficeDocumentExtension(infile):
+                    self.logger.info(f'Applying MOTW bypass on ZIP by setting {os.path.basename(infile)} as Read-Only upon extraction.')
+                
+                    basename = os.path.basename(infile)
+                    tmpdst = ''
+                    with tempfile.NamedTemporaryFile() as f:
+                        tmpdst = f.name + os.path.splitext(outfile)[1]
+
+                    shutil.copyfile(outfile, tmpdst)
+                    
+                    outzip = zipfile.ZipFile(tmpdst, 'w')
+                    inzip = zipfile.ZipFile(outfile)
+                    changed = False
+
+                    for i in inzip.infolist():
+                        if i.filename == basename:
+                            changed = True
+                            x = i.external_attr
+                            i.external_attr = i.external_attr | 0x1 # FILE_ATTRIBUTE_READONLY
+                            self.logger.dbg(f'\tSet ZIPDIRENTRY.external_attr from 0x{x:08x} to 0x{i.external_attr:08x}')
+
+                        buf = inzip.read(i.filename)
+                        outzip.writestr(i, buf)
+
+                    outzip.close()
+                    inzip.close()
+
+                    if changed:
+                        os.remove(outfile)
+                        shutil.move(tmpdst, outfile)
+                    else:
+                        os.remove(tmpdst)
 
             if self.password:
                 f = tempfile.NamedTemporaryFile(delete=False)
