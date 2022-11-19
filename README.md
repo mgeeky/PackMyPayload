@@ -218,7 +218,7 @@ usage:
 o      ~     +           ~          <mb [at] binary-offensive.com>
     o           +                         o           +           +
 
-Usage: ./package.py [options] <infile> <outfile>
+Usage: PackMyPayload.py [options] <infile> <outfile>
 
 options:
   -h, --help            show this help message and exit
@@ -236,12 +236,13 @@ Options:
   -n NAME, --filename NAME
                         Package input file into archive/container under this filename (may contain relative path).
   -p PASSWORD, --password PASSWORD
-                        If output archive/container format supports password protection, use this password to protect
-                        output file.
+                        If output archive/container format supports password protection, use this password to protect output file.
   --out-format {zip,7z,iso,img,cab,pdf,vhd,vhdx}
-                        Explicitely define output format disregarding output file's extension. Can be one of
-                        following: zip, 7z, iso, img, cab, pdf, vhd, vhdx
+                        Explicitely define output format disregarding output file's extension. Can be one of following: zip, 7z, iso, img, cab, pdf, vhd, vhdx
   --hide HIDE           Set hidden attribute on file(s) in ISO
+
+ZIP specific options:
+  --zip-noreadonly      DISABLE ZIP MOTW bypass that is used by default. By default, PackMyPayload marks Office files as Read-Only making ZIP software unable to set MOTW flag on them when extracted. This option disables that behavior.
 
 VHD specific options:
   --vhd-size SIZE       VHD dynamic size in MB. Default: 1024
