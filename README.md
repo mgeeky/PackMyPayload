@@ -113,7 +113,7 @@ Formats supported:
 
 | Format | Strips MOTW? | Off the shelf Windows support? | Elevation required? | Remarks                                       |
 |--------|--------------|--------------------------------|---------------------|-----------------------------------------------|
-| `Zip`  | No*          | Yes                            | No                  | (MOTW stripped with [CVE-2022-41091](https://twitter.com/wdormann/status/1590044005395357697))       |
+| `Zip`  | No/Yes*      | Yes                            | No                  | (MOTW stripped with [CVE-2022-41091](https://twitter.com/wdormann/status/1590044005395357697))       |
 | `7zip` | Partially    | No                             | No                  | MOTW stripped only on manual files extraction |
 | `ISO`  | Yes          | Yes                            | No                  |                                               |
 | `IMG`  | Yes          | Yes                            | No                  |                                               |
