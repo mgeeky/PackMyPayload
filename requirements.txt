@@ -4,3 +4,4 @@ py7zr
 pycdlib
 cabarchive
 pypdf2
+colorama
