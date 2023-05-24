@@ -297,12 +297,13 @@ class Packager:
             elif os.path.isdir(infile):
                 output = True
 
-                for fname in glob.iglob(infile + '/**/**', recursive=True):
+                for fname in glob.iglob(infile + '/**/*', recursive=True):
                     infile1 = fname
                     if os.path.isdir(infile1):
                         continue
-
-                    output &= self.doThePacking(infile1, outfile, outputFormat)
+                    local_path = os.path.relpath(infile1, start=infile)
+                    
+                    output &= self.doThePacking(infile1, outfile, outputFormat, local_path)
 
                     if not self.backdoorFile:
                         self.backdoorFile = outfile
@@ -312,14 +313,14 @@ class Packager:
 
         return output and os.path.isfile(outfile)
 
-    def doThePacking(self, infile, outfile, outputFormat):
+    def doThePacking(self, infile, outfile, outputFormat, local_path=None):
         output = False
 
         if outputFormat == 'zipfile':
-            output = self.packIntoZIP(infile, outfile)
+            output = self.packIntoZIP(infile, outfile, local_path)
 
         elif outputFormat == '7zip':
-            output = self.packInto7ZIP(infile, outfile)
+            output = self.packInto7ZIP(infile, outfile, local_path)
 
         elif outputFormat == 'pdf':
             output = self.packIntoPDF(infile, outfile)
@@ -370,7 +371,7 @@ class Packager:
         else:
             os.remove(tmpdst)
 
-    def packIntoZIP(self, infile, outfile):
+    def packIntoZIP(self, infile, outfile, local_path=None):
         try:
             mode = 'w'
             if self.backdoorFile:
@@ -378,7 +379,7 @@ class Packager:
 
             with zipfile.ZipFile(outfile, mode) as container:
                 with open(infile, 'rb') as f:
-                    container.write(infile, os.path.basename(infile))
+                    container.write(infile, local_path or os.path.basename(infile))
 
             zipAttribs = {}
 
@@ -458,7 +459,7 @@ class Packager:
 
             return False
 
-    def packInto7ZIP(self, infile, outfile):
+    def packInto7ZIP(self, infile, outfile, local_path=None):
         try:
             mode = 'w'
             if self.backdoorFile:
@@ -470,7 +471,7 @@ class Packager:
 
             with py7zr.SevenZipFile(outfile, mode=mode, password=pwd) as container:
                 with open(infile, 'rb') as f:
-                    container.write(infile, os.path.basename(infile))
+                    container.write(infile, local_path or os.path.basename(infile))
 
             if self.backdoorFile:
                 self.logger.text('[+] Backdoored existing 7zip with specified input file.', color='green')
