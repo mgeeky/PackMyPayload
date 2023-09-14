@@ -30,7 +30,7 @@ import ctypes
 
 from io import StringIO
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from PyPDF2 import PdfReader, PdfWriter
 from PyPDF2.generic import DecodedStreamObject, NameObject, DictionaryObject, createStringObject, ArrayObject
 
 try:
@@ -1119,12 +1119,12 @@ Pssst. .doc/.xls work like a charm ;-)
 =====================================================
 ''', color='red')
 
-            fw = PdfFileWriter()
+            fw = PdfWriter()
 
             if self.backdoorFile:
                 self.logger.text('Copying pages from backdoored PDF to the output one...')
 
-                fr = PdfFileReader(self.backdoorFile, 'rb')
+                fr = PdfReader(self.backdoorFile, 'rb')
                 fw.appendPagesFromReader(fr)
                 self.logger.info(f'Copied {fr.numPages} pages from backdoored file to output.')
 
